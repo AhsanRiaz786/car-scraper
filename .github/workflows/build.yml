@@ -1,13 +1,13 @@
-name: Build macOS Executable
+name: Build Windows Executable
 
 on:
   push:
     branches:
-      - main  # Trigger the workflow on pushes to the main branch
+      - main  # Adjust this to your preferred branch
 
 jobs:
-  build:
-    runs-on: macos-latest
+  build-windows:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -22,15 +22,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller playwright reportlab pillow
-          playwright install  # This installs necessary browser binaries for Playwright
+          playwright install  # Installs necessary browser binaries for Playwright
 
-      - name: Build executable with PyInstaller
+      - name: Build Windows executable with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --add-data "lux official logo.png:." Scrapers.py
+          pyinstaller --onefile --windowed --add-data "lux_official_logo.png;." Scrapers.py
 
-      - name: Upload artifact
+      - name: Upload Windows artifact
         uses: actions/upload-artifact@v3
         with:
-          name: CarScraper-macOS
+          name: CarScraper-Windows
           path: dist/
 
