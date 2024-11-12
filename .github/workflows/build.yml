@@ -3,7 +3,7 @@ name: Build macOS Executable
 on:
   push:
     branches:
-      - main  # Adjust this to your preferred branch
+      - main
 
 jobs:
   build-macos:
@@ -24,17 +24,17 @@ jobs:
           pip install pyinstaller playwright reportlab pillow requests tk
           
       - name: Install Chromium for Playwright
+        # Setting environment variable to install Chromium outside the PyInstaller package
         env:
           PLAYWRIGHT_BROWSERS_PATH: 0
         run: playwright install chromium
 
       - name: Build macOS executable with PyInstaller
         run: |
-          pyinstaller --onedir --noupx --windowed --add-data "lux_official_logo.png:." Scrapers.py
+          pyinstaller --onefile --windowed --add-data "lux_official_logo.png:." Scrapers.py
           
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v3
         with:
           name: CarScraper-macOS
           path: dist/
-
