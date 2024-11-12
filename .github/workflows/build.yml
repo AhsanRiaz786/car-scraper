@@ -1,13 +1,13 @@
-name: Build macOS Executable with cx_Freeze
+name: Build Windows Executable
 
 on:
   push:
     branches:
-      - main  # Adjust to your preferred branch
+      - main  # Adjust this to your preferred branch
 
 jobs:
-  build-macos:
-    runs-on: macos-latest
+  build-windows:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
@@ -21,20 +21,19 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install cx-Freeze playwright reportlab pillow requests tk
+          pip install pyinstaller playwright reportlab pillow requests tk
           
-      - name: Install Playwright Browsers
-        run: playwright install chromium  # Installs Chromium browser
+      - name: Install Chromium for Playwright
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
+        run: playwright install chromium
 
-      - name: Configure Playwright Browser Path
-        run: echo "PLAYWRIGHT_BROWSERS_PATH=0" >> $GITHUB_ENV
-
-      - name: Build macOS executable with cx_Freeze
+      - name: Build Windows executable with PyInstaller
         run: |
-          python setup.py build
-
-      - name: Upload macOS artifact
+          pyinstaller --onefile --windowed --add-data "lux_official_logo.png;." Scrapers.py
+          
+      - name: Upload Windows artifact
         uses: actions/upload-artifact@v3
         with:
-          name: CarScraper-macOS
-          path: build/
+          name: CarScraper-Windows
+          path: dist/
