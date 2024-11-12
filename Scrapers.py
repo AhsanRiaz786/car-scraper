@@ -15,25 +15,6 @@ from time import sleep
 from PIL import Image
 from tkinter import ttk
 from tkinter import messagebox
-import os
-
-
-def ensure_chromium_installed():
-    # Check if Chromium is installed locally
-    playwright_browsers_path = os.getenv("PLAYWRIGHT_BROWSERS_PATH", "")
-    if not playwright_browsers_path:
-        # Set the local path for browser storage
-        os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
-    
-    with sync_playwright() as p:
-        # Install Chromium if not already installed
-       browser = p.chromium.launch()
-       browser.close()
-
-# Your main script code
-if __name__ == "__main__":
-    ensure_chromium_installed()
-    # Rest of your scraping logic...
 
 
 class CarScraperGUI:
@@ -702,7 +683,6 @@ def get_scraper(url):
 # # Example Usage
 
 if __name__ == "__main__":
-    ensure_chromium_installed()
     root = tk.Tk()
     app = CarScraperGUI(root)
     root.mainloop()
