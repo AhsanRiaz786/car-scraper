@@ -24,6 +24,8 @@ jobs:
           pip install pyinstaller playwright reportlab pillow requests tk
           
       - name: Install Playwright Browsers
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: 0
         run: playwright install chromium
 
       - name: Build macOS onedir executable with PyInstaller
