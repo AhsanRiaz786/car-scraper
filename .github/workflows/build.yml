@@ -1,9 +1,9 @@
-name: Build macOS Executable with External Browser Directory
+name: Build macOS Executable with cx_Freeze
 
 on:
   push:
     branches:
-      - main
+      - main  # Adjust to your preferred branch
 
 jobs:
   build-macos:
@@ -21,19 +21,20 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller playwright reportlab pillow requests tk
+          pip install cx-Freeze playwright reportlab pillow requests tk
           
       - name: Install Playwright Browsers
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
-        run: playwright install chromium
+        run: playwright install chromium  # Installs Chromium browser
 
-      - name: Build macOS onedir executable with PyInstaller
+      - name: Configure Playwright Browser Path
+        run: echo "PLAYWRIGHT_BROWSERS_PATH=0" >> $GITHUB_ENV
+
+      - name: Build macOS executable with cx_Freeze
         run: |
-          pyinstaller --onedir --windowed --add-data "lux_official_logo.png:." Scrapers.py
+          python setup.py build
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v3
         with:
           name: CarScraper-macOS
-          path: dist/
+          path: build/
