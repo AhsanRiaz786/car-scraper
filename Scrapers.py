@@ -586,7 +586,7 @@ class ManheimScraper(BaseScraper):
         details_mapping = {
             "Status":"span[data-test-id='status-label']",
             "Current Bid":"span.bid-widget__value.current-price",
-            "Time Left": "span.bboEndStartTime",
+            "Time Left": "span.bboEndStartTime"
   
                     }
 
