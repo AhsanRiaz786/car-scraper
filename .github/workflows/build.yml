@@ -1,4 +1,4 @@
-name: Build Windows Executable
+name: Build macOS Executable
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main  # Adjust this to your preferred branch
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build-macos:
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
@@ -28,13 +28,13 @@ jobs:
           PLAYWRIGHT_BROWSERS_PATH: 0
         run: playwright install chromium
 
-      - name: Build Windows executable with PyInstaller
+      - name: Build macOS executable with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --add-data "lux_official_logo.png;." Scrapers.py
+          pyinstaller --onefile --windowed --add-data "lux_official_logo.png:." Scrapers.py
           
-      - name: Upload Windows artifact
+      - name: Upload macOS artifact
         uses: actions/upload-artifact@v3
         with:
-          name: CarScraper-Windows
+          name: CarScraper-macOS
           path: dist/
 
