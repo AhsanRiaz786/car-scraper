@@ -149,7 +149,7 @@ class BaseScraper:
         y_position = height - 50
 
         # Add logo if available
-        logo_path = "lux official logo.png"
+        logo_path = "lux_official_logo.png"
         try:
             logo = ImageReader(logo_path)
             logo_width, logo_height = logo.getSize()
