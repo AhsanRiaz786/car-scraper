@@ -642,7 +642,7 @@ class ManheimScraper(BaseScraper):
             browser = playwright.chromium.launch(headless=False, args=["--window-position=-10000,-10000"])
             page = browser.new_page()
             self.load_cookies(page)
-            page.goto(self.url)
+            page.goto(self.url, wait_until="domcontentloaded", timeout=10000)
 
             try:
                 # Check if login is required
@@ -653,7 +653,7 @@ class ManheimScraper(BaseScraper):
                     browser = playwright.chromium.launch(headless=False, args=["--window-position=-10000,-10000"])
                     page = browser.new_page()
                     self.load_cookies(page)
-                    page.goto(self.url)
+                    page.goto(self.url, wait_until="domcontentloaded", timeout=10000)
 
                 # Scrape data after login
                 page.wait_for_selector("span.ListingTitle__title")
@@ -693,12 +693,4 @@ if __name__ == "__main__":
     app = CarScraperGUI(root)
     root.mainloop()
 
-
-
-
-
-
-
-                
-        
 
