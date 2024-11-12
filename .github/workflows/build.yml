@@ -29,9 +29,8 @@ jobs:
           pyinstaller --onefile --windowed --add-data "lux_official_logo.png:." Scrapers.py
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: CarScraper-macOS
           path: dist/
-
 
