@@ -1,9 +1,9 @@
-name: Build macOS Executable
+name: Build macOS Executable with External Browser Directory
 
 on:
   push:
     branches:
-      - main  # Adjust this to your preferred branch
+      - main
 
 jobs:
   build-macos:
@@ -23,15 +23,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller playwright reportlab pillow requests tk
           
-      - name: Install Chromium for Playwright
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: 0
+      - name: Install Playwright Browsers
         run: playwright install chromium
 
-      - name: Build macOS executable with PyInstaller
+      - name: Build macOS onedir executable with PyInstaller
         run: |
-          pyinstaller --onefile --windowed --add-data "lux_official_logo.png:." Scrapers.py
-          
+          pyinstaller --onedir --windowed --add-data "lux_official_logo.png:." Scrapers.py
+
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v3
         with:
