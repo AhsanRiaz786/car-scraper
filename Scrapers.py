@@ -15,51 +15,44 @@ from time import sleep
 from PIL import Image
 from tkinter import ttk
 from tkinter import messagebox
-import os
 
 
-def ensure_chromium_installed():
-    # Check if Chromium is installed locally
-    playwright_browsers_path = os.getenv("PLAYWRIGHT_BROWSERS_PATH", "")
-    if not playwright_browsers_path:
-        # Set the local path for browser storage
-        os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "0"
-    
-    with sync_playwright() as p:
-        # Install Chromium if not already installed
-       browser = p.chromium.launch()
-       browser.close()
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+from threading import Thread
 
-# Your main script code
-if __name__ == "__main__":
-    ensure_chromium_installed()
-    # Rest of your scraping logic...
-
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+from threading import Thread
 
 class CarScraperGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Car Scraper")
-        self.root.geometry("400x200")
+        self.root.geometry("600x500")
+        self.root.configure(background='white')  # Set background for better visibility on macOS
         
+        # Set default font
+        default_font = ("Helvetica", 12)
+
         # URL Entry
-        tk.Label(root, text="Enter the site URL:").pack(pady=5)
-        self.url_entry = tk.Entry(root, width=50)
+        tk.Label(root, text="Enter the site URL:", font=default_font, bg='white').pack(pady=5)
+        self.url_entry = tk.Entry(root, width=50, font=default_font)
         self.url_entry.pack(pady=5)
         
         # Save Location
-        tk.Label(root, text="Select Save Location for PDF:").pack(pady=5)
-        self.save_location_button = tk.Button(root, text="Browse", command=self.select_save_location)
+        tk.Label(root, text="Select Save Location for PDF:", font=default_font, bg='white').pack(pady=5)
+        self.save_location_button = tk.Button(root, text="Browse", font=default_font, command=self.select_save_location)
         self.save_location_button.pack(pady=5)
         
         self.save_path = None
         
         # Generate PDF Button
-        self.generate_button = tk.Button(root, text="Generate PDF", command=self.start_pdf_generation)
+        self.generate_button = tk.Button(root, text="Generate PDF", font=default_font, command=self.start_pdf_generation)
         self.generate_button.pack(pady=5)
         
         # Status Label
-        self.status_label = tk.Label(root, text="")
+        self.status_label = tk.Label(root, text="", font=default_font, bg='white')
         self.status_label.pack(pady=5)
 
     def select_save_location(self):
@@ -77,7 +70,7 @@ class CarScraperGUI:
             return
         
         # Check for specific sites to prompt additional data input
-        if "sbtjapan" in url or "beforward" in url:
+        if "sbtjapan" in url or "beforward" in url or "manheim" in url:
             self.show_additional_inputs(url)
         else:
             # No additional inputs needed, proceed to generate PDF
@@ -87,40 +80,47 @@ class CarScraperGUI:
         # New window for additional inputs
         additional_window = tk.Toplevel(self.root)
         additional_window.title("Additional Information")
-        additional_window.geometry("400x300")
+        additional_window.geometry("500x500")
+        additional_window.configure(background='white')
         
         # Total Price
-        tk.Label(additional_window, text="Total Price").pack(pady=5)
-        total_price_entry = tk.Entry(additional_window, width=20)
+        tk.Label(additional_window, text="Total Price", font=("Helvetica", 12), bg='white').pack(pady=5)
+        total_price_entry = tk.Entry(additional_window, width=20, font=("Helvetica", 12))
         total_price_entry.pack(pady=5)
         
-        # Island Dropdown
-        tk.Label(additional_window, text="Select Island").pack(pady=5)
-        island_var = tk.StringVar()
-        island_dropdown = ttk.Combobox(additional_window, textvariable=island_var)
-        island_dropdown['values'] = ("Abaco", "Nassau", "Freeport", "Exuma", "Eleuthera", "Spanish Wells")
-        island_dropdown.pack(pady=5)
-        
-        # Title Half Down Option (optional)
-        tk.Label(additional_window, text="Half Down").pack(pady=5)
-        title_half_down_entry = tk.Entry(additional_window, width=20)
-        title_half_down_entry.pack(pady=5)
+        # Show additional fields for `sbtjapan` and `beforward`
+        if "sbtjapan" in url or "beforward" in url:
+            # Island Dropdown
+            tk.Label(additional_window, text="Select Island", font=("Helvetica", 12), bg='white').pack(pady=5)
+            island_var = tk.StringVar()
+            island_dropdown = ttk.Combobox(additional_window, textvariable=island_var, font=("Helvetica", 12))
+            island_dropdown['values'] = ("Abaco", "Nassau", "Freeport", "Exuma", "Eleuthera", "Spanish Wells")
+            island_dropdown.pack(pady=5)
+            
+            # Title Half Down Option (optional)
+            tk.Label(additional_window, text="Half Down", font=("Helvetica", 12), bg='white').pack(pady=5)
+            title_half_down_entry = tk.Entry(additional_window, width=20, font=("Helvetica", 12))
+            title_half_down_entry.pack(pady=5)
+        else:
+            # Only collect `Total Price` for `manheim`
+            island_var = None
+            title_half_down_entry = None
         
         # Submit Button
-        submit_button = tk.Button(additional_window, text="Submit", command=lambda: self.submit_additional_inputs(
-            additional_window, url, total_price_entry.get(), island_var.get(), title_half_down_entry.get()
+        submit_button = tk.Button(additional_window, text="Submit", font=("Helvetica", 12), command=lambda: self.submit_additional_inputs(
+            additional_window, url, total_price_entry.get(), island_var.get() if island_var else "", title_half_down_entry.get() if title_half_down_entry else ""
         ))
         submit_button.pack(pady=10)
 
     def submit_additional_inputs(self, additional_window, url, total_price, island, title_half_down):
         additional_window.destroy()  # Close the input window
 
-        # Collect additional data
-        additional_data = {
-            "Total Price": total_price+" $",
-            "Island": island,
-            "Half Down": title_half_down,
-        }
+        # Collect additional data based on URL
+        additional_data = {"Total Price": total_price + " $"}
+        if "sbtjapan" in url or "beforward" in url:
+            additional_data["Island"] = island
+            additional_data["Half Down"] = title_half_down
+        
         # Proceed to generate the PDF
         self.generate_pdf(url, additional_data)
 
@@ -144,6 +144,7 @@ class CarScraperGUI:
         except Exception as e:
             self.status_label.config(text="Error generating PDF.")
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
 
 
 
@@ -585,11 +586,7 @@ class ManheimScraper(BaseScraper):
         details_mapping = {
             "Status":"span[data-test-id='status-label']",
             "Current Bid":"span.bid-widget__value.current-price",
-            "Adj MMR": "a.MmrValuation__link",
             "Time Left": "span.bboEndStartTime",
-            "Pick Up Location": "span[data-test-id='pickup-location-container']",
-            "Vehicle Location": "span[data-test-id='vehicle-location-value']",
-            "Seller": "span.bid-widget__value.bid-widget__value--seller-name"
   
                     }
 
@@ -615,7 +612,10 @@ class ManheimScraper(BaseScraper):
                 key = column.query_selector("div.dt.collapsible-top-label")
                 value = column.query_selector("div.dd,.collapsible-bottom-value")
                 if key and value:
-                    self.data[key.inner_text()] = value.inner_text()
+                    if(key.inner_text()=="MSRP"):
+                        continue
+                    else:
+                        self.data[key.inner_text()] = value.inner_text()
 
 
 
@@ -632,7 +632,7 @@ class ManheimScraper(BaseScraper):
                     break
             if next_button:
                 next_button.click()
-                time.sleep(4)
+                time.sleep(3)
             else:
                 break
 
@@ -642,7 +642,7 @@ class ManheimScraper(BaseScraper):
             browser = playwright.chromium.launch(headless=False, args=["--window-position=-10000,-10000"])
             page = browser.new_page()
             self.load_cookies(page)
-            page.goto(self.url, wait_until="domcontentloaded", timeout=10000)
+            page.goto(self.url)
 
             try:
                 # Check if login is required
@@ -667,23 +667,10 @@ class ManheimScraper(BaseScraper):
                 browser.close()
 
 
-
-
-                    
-
+          
 
 
 
-
- 
-
-
-
-
-
-
-
-            
 def get_scraper(url):
     domain = urlparse(url).netloc
     if "copart.com" in domain:
@@ -702,7 +689,16 @@ def get_scraper(url):
 # # Example Usage
 
 if __name__ == "__main__":
-    ensure_chromium_installed()
     root = tk.Tk()
     app = CarScraperGUI(root)
     root.mainloop()
+
+
+
+
+
+
+
+                
+        
+
